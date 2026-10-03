@@ -276,6 +276,33 @@ kbd {
 .kw { font-size: .9rem; color: var(--dust); }
 .kw b { font-family: var(--f-jp); color: var(--star); font-size: 1rem; }
 
+/* ---------- grammar ---------- */
+.glist { display: flex; flex-direction: column; gap: 8px; }
+.gitem { border: 1px solid var(--rim); background: var(--deep-2); border-radius: var(--r-sm); }
+.gitem[open] { border-color: var(--rim-hi); }
+.gsum { list-style: none; cursor: pointer; padding: 12px 14px; display: grid; grid-template-columns: 2.6rem minmax(0, 1.3fr) minmax(0, 1fr); gap: 4px 12px; align-items: baseline; }
+.gsum::-webkit-details-marker { display: none; }
+.gsum:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: var(--r-sm); }
+.gid { font-family: var(--f-mono); font-size: .76rem; color: var(--gold); }
+.gpat { font-family: var(--f-jp); font-weight: 700; font-size: 1.02rem; overflow-wrap: anywhere; }
+.gvi { font-size: .88rem; color: var(--dust); }
+.gbody { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 10px; }
+.gbody .ex { border-top: 1px dashed var(--rim); }
+.gnote { margin: 0; font-size: .9rem; color: var(--star); line-height: 1.6; }
+.gnote::before { content: "Ghi chú · "; color: var(--dust); font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.gbody .ghost { align-self: flex-start; padding: 7px 14px; font-size: .86rem; }
+.gprompt { text-align: center; padding-block: 12px 4px; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.gsent { font-family: var(--f-jp); font-weight: 500; font-size: clamp(1.35rem, 4.6vw, 1.85rem); line-height: 1.7; max-width: 30ch; text-wrap: balance; }
+.blank { display: inline-block; min-width: 3.2em; border-bottom: 2px solid var(--gold); margin: 0 .15em; color: transparent; }
+.gfill { font-weight: 700; padding: 0 .15em; border-radius: 6px; }
+.gfill.ok { color: var(--ok); background: var(--ok-bg); }
+.gfill.no { color: var(--bad); background: var(--bad-bg); }
+.ghint { font-size: .95rem; color: var(--dust); }
+.opt .t .gj { font-family: var(--f-jp); font-weight: 700; font-size: 1.15rem; line-height: 1.35; overflow-wrap: anywhere; }
+.gpoint { background: var(--deep-2); border: 1px solid var(--rim); border-radius: var(--r-sm); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.gpoint .gpat { font-size: .98rem; }
+.gpoint p { margin: 0; font-size: .86rem; color: var(--dust); line-height: 1.55; }
+
 /* ---------- ML data panel ---------- */
 .data { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
 .data-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
@@ -318,8 +345,10 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
   .kdetail { grid-template-columns: 1fr; justify-items: start; gap: 16px; }
   .kd-row { grid-template-columns: 1fr; gap: 4px; }
   .kana-grid { gap: 4px; }
-  .tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-radius: 16px; gap: 4px; }
-  .tabs button { flex-direction: column; gap: 0; padding: 7px 2px; font-size: .78rem; border-radius: 12px; }
+  .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-radius: 16px; gap: 3px; }
+  .tabs button { flex-direction: column; gap: 0; padding: 7px 1px; font-size: .72rem; border-radius: 12px; }
+  .gsum { grid-template-columns: 2.6rem minmax(0, 1fr); }
+  .gsum .gvi { grid-column: 2; }
   .dnums { grid-template-columns: repeat(2, 1fr); }
   .data { padding: 18px 16px; }
   .opts { grid-template-columns: 1fr; }
@@ -344,7 +373,7 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
       </svg>
       <div>
         <h1>Vũ Trụ Từ Vựng<span class="jp">N5</span></h1>
-        <p>Trắc nghiệm từ vựng JLPT N5 · <span id="totalWords"></span> từ</p>
+        <p>Từ vựng · Kanji · Ngữ pháp JLPT N5 · <span id="totalWords"></span> từ</p>
       </div>
     </div>
     <div class="meter" id="meter"></div>
@@ -355,6 +384,7 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
     <button data-view="hira"><span class="tj">あ</span>Hiragana</button>
     <button data-view="kata"><span class="tj">ア</span>Katakana</button>
     <button data-view="kanji"><span class="tj">字</span>Kanji</button>
+    <button data-view="grammar"><span class="tj">文</span>Ngữ pháp</button>
   </nav>
 
   <div id="viewQuiz" class="stack">
@@ -473,6 +503,43 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
   <!-- KANA TABLES -->
   <section id="viewHira" class="panel chart" hidden aria-label="Bảng Hiragana"></section>
   <section id="viewKata" class="panel chart" hidden aria-label="Bảng Katakana"></section>
+
+  <!-- GRAMMAR -->
+  <section id="viewGrammar" class="stack" hidden aria-label="Ngữ pháp N5">
+    <div class="panel chart" id="gList">
+      <div class="chart-head">
+        <div><h2>Ngữ pháp N5</h2><p><span id="gCount"></span> mẫu, mỗi mẫu có ví dụ và câu luyện. Bấm vào một mẫu để xem chi tiết.</p></div>
+        <button class="go" id="gStart">Luyện</button>
+      </div>
+      <div class="chips" id="gCats"></div>
+      <div class="glist" id="gItems"></div>
+    </div>
+
+    <div id="gQuiz" class="stack" hidden>
+      <div class="qbar">
+        <button class="x" id="gQuit" title="Kết thúc lượt luyện" aria-label="Kết thúc lượt luyện">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="track"><div class="fill" id="gFill"></div></div>
+        <span class="count" id="gCountQ">0 / 0</span>
+      </div>
+      <div class="panel card">
+        <div class="qhead">
+          <span class="qtype">Chọn phần điền vào chỗ trống</span>
+          <span style="display:flex;gap:6px;align-items:center">
+            <span class="again" id="gAgain" hidden>Hỏi lại</span>
+            <span class="pos" id="gTag"></span>
+          </span>
+        </div>
+        <div class="gprompt" id="gPrompt" aria-live="polite"></div>
+        <div class="opts" id="gOpts"></div>
+        <div class="under" id="gUnder"><button class="dunno" id="gDunno">Không biết?</button></div>
+        <div id="gFb" hidden></div>
+      </div>
+    </div>
+
+    <div id="gRes" class="panel res" hidden></div>
+  </section>
 
   <!-- KANJI -->
   <section id="viewKanji" class="stack" hidden aria-label="Bảng Kanji">
@@ -994,7 +1061,7 @@ function show(id) {
 
 /* ---------- tabs ---------- */
 let VIEW = "quiz";
-const VIEWS = { quiz: "viewQuiz", hira: "viewHira", kata: "viewKata", kanji: "viewKanji" };
+const VIEWS = { quiz: "viewQuiz", hira: "viewHira", kata: "viewKata", kanji: "viewKanji", grammar: "viewGrammar" };
 function setView(v) {
   if (!VIEWS[v]) v = "quiz";
   VIEW = v;
@@ -1117,6 +1184,136 @@ $("kGrid").addEventListener("click", e => {
   if (window.innerWidth < 700) $("kDetail").scrollIntoView({ behavior: "smooth", block: "start" });
 });
 renderKanjiDetail(KANJI[0]);
+
+/* ---------- grammar ---------- */
+const GRAMMAR = [{"id":"G01","cat":"Câu cơ bản","pat":"N は N です / じゃ ありません / ですか","vi":"A là B / A không phải B / A có phải B không?","exJp":"わたしは がくせいです。","exRo":"watashi wa gakusei desu.","exVi":"Tôi là sinh viên.","note":"Phủ định: じゃ ありません (= では ありません, trang trọng hơn). Câu hỏi: thêm か ở cuối, không cần dấu ?.","qs":[{"s":"あなたは がくせい＿＿か。","a":"です","o":["ます","の","が"],"ro":"anata wa gakusei desu ka.","vi":"Bạn là sinh viên à?"},{"s":"わたしは せんせい＿＿。","a":"じゃ ありません","o":["じゃ ありますか","くないです","ませんでした"],"ro":"watashi wa sensei ja arimasen.","vi":"Tôi không phải giáo viên."}]},{"id":"G02","cat":"Câu cơ bản","pat":"これ・それ・あれ / この・その・あの + N / ここ・そこ・あそこ・どこ","vi":"cái này/đó/kia · …này/đó/kia · chỗ này/đó/kia/đâu","exJp":"この ほんは わたしのです。","exRo":"kono hon wa watashi no desu.","exVi":"Quyển sách này là của tôi.","note":"これ đứng một mình; この phải đi kèm danh từ. こ = gần người nói, そ = gần người nghe, あ = xa cả hai.","qs":[{"s":"＿＿ ほんは いくらですか。","a":"この","o":["これ","ここ","どこ"],"ro":"kono hon wa ikura desu ka.","vi":"Quyển sách này bao nhiêu tiền?"},{"s":"トイレは ＿＿ですか。","a":"どこ","o":["どれ","どの","だれ"],"ro":"toire wa doko desu ka.","vi":"Nhà vệ sinh ở đâu?"}]},{"id":"G03","cat":"Câu cơ bản","pat":"N の N","vi":"N của N / N thuộc loại N","exJp":"これは わたしの かさです。","exRo":"kore wa watashi no kasa desu.","exVi":"Đây là cái ô của tôi.","note":"Danh từ trước の bổ nghĩa cho danh từ sau: にほんごの ほん = sách tiếng Nhật. Có thể bỏ danh từ sau: わたしのです = của tôi.","qs":[{"s":"これは せんせい＿＿ ほんです。","a":"の","o":["は","を","に"],"ro":"kore wa sensei no hon desu.","vi":"Đây là sách của thầy giáo."},{"s":"その かさは だれ＿＿ですか。","a":"の","o":["が","を","へ"],"ro":"sono kasa wa dare no desu ka.","vi":"Cái ô đó là của ai?"}]},{"id":"G04","cat":"Câu cơ bản","pat":"なに・だれ・どこ・いつ・いくら・どう・どうして / なにか・なにも","vi":"gì, ai, đâu, khi nào, bao nhiêu, thế nào, tại sao / …gì đó · không…gì cả","exJp":"きのう なにも たべませんでした。","exRo":"kinou nani mo tabemasen deshita.","exVi":"Hôm qua tôi không ăn gì cả.","note":"Từ để hỏi + か = “…đó” (なにか, だれか, どこか). Từ để hỏi + も + phủ định = “không … gì/ai/đâu cả”. Trả lời どうして bằng 〜から.","qs":[{"s":"おなかが すきました。＿＿ たべませんか。","a":"なにか","o":["なにも","なに","なんで"],"ro":"onaka ga sukimashita. nanika tabemasen ka.","vi":"Đói bụng rồi. Ăn gì đó không?"},{"s":"へやに ＿＿ いません。","a":"だれも","o":["だれか","だれ","だれが"],"ro":"heya ni dare mo imasen.","vi":"Trong phòng không có ai cả."}]},{"id":"G05","cat":"Trợ từ","pat":"は・が・も","vi":"chủ đề / chủ thể / cũng","exJp":"だれが きましたか。…たなかさんが きました。","exRo":"dare ga kimashita ka. … Tanaka-san ga kimashita.","exVi":"Ai đã đến? … Anh Tanaka đã đến.","note":"は nêu chủ đề đã biết; が đứng sau từ để hỏi làm chủ ngữ và trong câu trả lời cho nó. も thay cho は, が, を; với に/で thì thành にも/でも.","qs":[{"s":"だれ＿＿ きますか。","a":"が","o":["は","を","で"],"ro":"dare ga kimasu ka.","vi":"Ai sẽ đến?"},{"s":"わたしは がくせいです。ミンさん＿＿ がくせいです。","a":"も","o":["を","に","の"],"ro":"watashi wa gakusei desu. Min-san mo gakusei desu.","vi":"Tôi là sinh viên. Bạn Minh cũng là sinh viên."}]},{"id":"G06","cat":"Trợ từ","pat":"を","vi":"đánh dấu tân ngữ (đối tượng của hành động)","exJp":"まいあさ コーヒーを のみます。","exRo":"maiasa koohii o nomimasu.","exVi":"Sáng nào tôi cũng uống cà phê.","note":"を đọc là “o”. Đi với động từ tác động lên vật: たべる, のむ, みる, かう, よむ…","qs":[{"s":"ほん＿＿ よみます。","a":"を","o":["が","に","へ"],"ro":"hon o yomimasu.","vi":"Tôi đọc sách."},{"s":"スーパーで やさい＿＿ かいました。","a":"を","o":["で","に","が"],"ro":"suupaa de yasai o kaimashita.","vi":"Tôi đã mua rau ở siêu thị."}]},{"id":"G07","cat":"Trợ từ","pat":"に・へ","vi":"lúc (thời điểm) / đến (nơi đến) / ở (nơi tồn tại) / cho (người nhận)","exJp":"7じに おきます。にほんへ いきます。","exRo":"shichiji ni okimasu. nihon e ikimasu.","exVi":"Tôi dậy lúc 7 giờ. Tôi đi Nhật.","note":"に đi với giờ, ngày, tháng cụ thể (không dùng với きょう, あした, まいにち). へ (đọc “e”) chỉ hướng đi, thay được cho に với いきます/きます/かえります.","qs":[{"s":"まいあさ 6じ＿＿ おきます。","a":"に","o":["で","を","が"],"ro":"maiasa rokuji ni okimasu.","vi":"Sáng nào tôi cũng dậy lúc 6 giờ."},{"s":"らいねん にほん＿＿ いきます。","a":"へ","o":["を","で","が"],"ro":"rainen nihon e ikimasu.","vi":"Năm sau tôi đi Nhật."}]},{"id":"G08","cat":"Trợ từ","pat":"で","vi":"ở (nơi diễn ra hành động) / bằng (phương tiện, công cụ)","exJp":"バスで がっこうへ いきます。","exRo":"basu de gakkou e ikimasu.","exVi":"Tôi đi học bằng xe buýt.","note":"Phân biệt: としょかんで べんきょうします (nơi hành động) ≠ としょかんに います (nơi tồn tại).","qs":[{"s":"としょかん＿＿ べんきょうします。","a":"で","o":["に","を","へ"],"ro":"toshokan de benkyou shimasu.","vi":"Tôi học ở thư viện."},{"s":"はし＿＿ ごはんを たべます。","a":"で","o":["に","を","と"],"ro":"hashi de gohan o tabemasu.","vi":"Tôi ăn cơm bằng đũa."}]},{"id":"G09","cat":"Trợ từ","pat":"と・や・か","vi":"cùng với, và / …và vân vân / hoặc","exJp":"ともだちと えいがを みます。","exRo":"tomodachi to eiga o mimasu.","exVi":"Tôi xem phim với bạn.","note":"と liệt kê đầy đủ (A と B); や liệt kê vài cái tiêu biểu (A や B など); か = hoặc (コーヒーか こうちゃ).","qs":[{"s":"かばんに ほん＿＿ ノートなどが あります。","a":"や","o":["を","で","へ"],"ro":"kaban ni hon ya nooto nado ga arimasu.","vi":"Trong cặp có sách, vở, v.v."},{"s":"コーヒー＿＿ こうちゃを のみますか。","a":"か","o":["を","が","で"],"ro":"koohii ka koucha o nomimasu ka.","vi":"Bạn uống cà phê hay trà?"}]},{"id":"G10","cat":"Trợ từ","pat":"から・まで","vi":"từ … đến …","exJp":"9じから 5じまで はたらきます。","exRo":"kuji kara goji made hatarakimasu.","exVi":"Tôi làm việc từ 9 giờ đến 5 giờ.","note":"Dùng cho cả thời gian và địa điểm: うちから えきまで あるきます.","qs":[{"s":"ぎんこうは 9じ＿＿ 3じまでです。","a":"から","o":["まで","に","で"],"ro":"ginkou wa kuji kara sanji made desu.","vi":"Ngân hàng làm từ 9 giờ đến 3 giờ."},{"s":"うちから えき＿＿ あるきます。","a":"まで","o":["から","が","の"],"ro":"uchi kara eki made arukimasu.","vi":"Tôi đi bộ từ nhà đến ga."}]},{"id":"G11","cat":"Trợ từ","pat":"ぐらい・ごろ・だけ","vi":"khoảng (lượng) / khoảng (thời điểm) / chỉ","exJp":"11じごろ ねます。","exRo":"juuichiji goro nemasu.","exVi":"Tôi ngủ khoảng 11 giờ.","note":"ぐらい (くらい) đi với lượng, khoảng thời gian: 1じかんぐらい. ごろ đi với thời điểm: 3じごろ. だけ = chỉ: ひとつだけ.","qs":[{"s":"まいにち 2じかん＿＿ べんきょうします。","a":"ぐらい","o":["ごろ","まで","に"],"ro":"mainichi nijikan gurai benkyou shimasu.","vi":"Mỗi ngày tôi học khoảng 2 tiếng."},{"s":"りんごを ひとつ＿＿ かいました。","a":"だけ","o":["ごろ","から","を"],"ro":"ringo o hitotsu dake kaimashita.","vi":"Tôi chỉ mua một quả táo."}]},{"id":"G12","cat":"Trợ từ","pat":"〜ね / 〜よ (cuối câu)","vi":"…nhỉ / …đấy","exJp":"きょうは さむいですね。","exRo":"kyou wa samui desu ne.","exVi":"Hôm nay lạnh nhỉ.","note":"ね: tìm sự đồng tình, người nghe cũng biết. よ: báo thông tin người nghe chưa biết.","qs":[{"s":"A: いい てんきです＿＿。B: そうですね。","a":"ね","o":["よ","か","を"],"ro":"A: ii tenki desu ne. B: sou desu ne.","vi":"A: Trời đẹp nhỉ. B: Ừ nhỉ."},{"s":"あの みせの ラーメンは おいしいです＿＿。たべて みて ください。","a":"よ","o":["ね","か","の"],"ro":"ano mise no raamen wa oishii desu yo. tabete mite kudasai.","vi":"Mì ramen quán đó ngon lắm đấy. Ăn thử đi."}]},{"id":"G13","cat":"Động từ","pat":"Vます・Vません・Vました・Vませんでした","vi":"làm / không làm / đã làm / đã không làm","exJp":"きのう テレビを みませんでした。","exRo":"kinou terebi o mimasen deshita.","exVi":"Hôm qua tôi không xem tivi.","note":"Thể lịch sự. ます: hiện tại hoặc tương lai; ました: quá khứ.","qs":[{"s":"きのう ともだちに あい＿＿。","a":"ました","o":["ます","ません","ましょう"],"ro":"kinou tomodachi ni aimashita.","vi":"Hôm qua tôi đã gặp bạn."},{"s":"けさ あさごはんを たべ＿＿。じかんが ありませんでしたから。","a":"ませんでした","o":["ました","ます","たいです"],"ro":"kesa asagohan o tabemasen deshita. jikan ga arimasen deshita kara.","vi":"Sáng nay tôi không ăn sáng vì không có thời gian."}]},{"id":"G14","cat":"Động từ","pat":"Thể thường: Vる・Vない・Vた","vi":"thể từ điển / phủ định / quá khứ (dạng ngắn)","exJp":"まいにち にほんごを べんきょうする。","exRo":"mainichi nihongo o benkyou suru.","exVi":"Ngày nào tớ cũng học tiếng Nhật.","note":"Dùng khi nói thân mật và đứng trước nhiều mẫu (まえに, ことが あります, とき…). Nhóm 1: のむ→のまない→のんだ. Nhóm 2: たべる→たべない→たべた. Bất quy tắc: する→しない→した, くる→こない→きた. Ngoại lệ: いく→いった.","qs":[{"s":"のみます → ＿＿（thể ない）","a":"のまない","o":["のみない","のむない","のんない"],"ro":"nomimasu → nomanai","vi":"uống → không uống"},{"s":"いきます → ＿＿（thể た）","a":"いった","o":["いきた","いいた","いんだ"],"ro":"ikimasu → itta","vi":"đi → đã đi (いく là ngoại lệ)"}]},{"id":"G15","cat":"Động từ","pat":"Vたいです / N が ほしいです","vi":"muốn làm / muốn có","exJp":"あたらしい くるまが ほしいです。","exRo":"atarashii kuruma ga hoshii desu.","exVi":"Tôi muốn có xe ô tô mới.","note":"Vたい: bỏ ます thêm たい (たべます→たべたい). ほしい đi với danh từ + が. Chỉ dùng cho mong muốn của bản thân.","qs":[{"s":"にほんへ いき＿＿です。","a":"たい","o":["ほしい","ます","たり"],"ro":"nihon e ikitai desu.","vi":"Tôi muốn đi Nhật."},{"s":"あたらしい パソコン＿＿ ほしいです。","a":"が","o":["を","に","で"],"ro":"atarashii pasokon ga hoshii desu.","vi":"Tôi muốn có máy tính mới."}]},{"id":"G16","cat":"Động từ","pat":"Vましょう / Vませんか / Vましょうか","vi":"cùng … nhé / … không? (mời) / để tôi … nhé?","exJp":"いっしょに ひるごはんを たべませんか。","exRo":"issho ni hirugohan o tabemasen ka.","exVi":"Cùng ăn trưa không?","note":"ませんか: mời lịch sự. ましょう: rủ hoặc đồng ý. ましょうか: đề nghị giúp (まどを あけましょうか = để tôi mở cửa sổ nhé?).","qs":[{"s":"A: いっしょに かえりませんか。B: ええ、かえり＿＿。","a":"ましょう","o":["ません","ましょうか","たい"],"ro":"A: issho ni kaerimasen ka. B: ee, kaerimashou.","vi":"A: Cùng về không? B: Ừ, về thôi."},{"s":"にもつが おもいですね。もち＿＿。","a":"ましょうか","o":["ませんか","ません","ました"],"ro":"nimotsu ga omoi desu ne. mochimashou ka.","vi":"Hành lý nặng nhỉ. Để tôi xách giúp nhé?"}]},{"id":"G17","cat":"Động từ","pat":"V(bỏ ます) / N + に いきます・きます","vi":"đi / đến để làm gì","exJp":"デパートへ かいものに いきます。","exRo":"depaato e kaimono ni ikimasu.","exVi":"Tôi đi trung tâm thương mại để mua sắm.","note":"Bỏ ます rồi thêm に: みます→みに いきます. Danh từ chỉ hành động thì thêm に trực tiếp: かいもの, しょくじ.","qs":[{"s":"こうえんへ さくらを み＿＿ いきます。","a":"に","o":["で","を","て"],"ro":"kouen e sakura o mi ni ikimasu.","vi":"Tôi đến công viên để ngắm hoa anh đào."},{"s":"にほんへ にほんごを ＿＿ きました。","a":"べんきょうしに","o":["べんきょうして","べんきょうする","べんきょうしたい"],"ro":"nihon e nihongo o benkyou shi ni kimashita.","vi":"Tôi đến Nhật để học tiếng Nhật."}]},{"id":"G18","cat":"Thể て・た","pat":"Vて ください / Vないで ください","vi":"hãy … / xin đừng …","exJp":"ここに なまえを かいて ください。","exRo":"koko ni namae o kaite kudasai.","exVi":"Hãy viết tên vào đây.","note":"Vないで: thể ない + で (たべない→たべないで).","qs":[{"s":"すみません、ちょっと まって＿＿。","a":"ください","o":["います","いけません","あります"],"ro":"sumimasen, chotto matte kudasai.","vi":"Xin lỗi, đợi tôi một chút."},{"s":"ここで しゃしんを とら＿＿ ください。","a":"ないで","o":["ないて","なくて","なかった"],"ro":"koko de shashin o toranaide kudasai.","vi":"Xin đừng chụp ảnh ở đây."}]},{"id":"G19","cat":"Thể て・た","pat":"Vても いいです / Vては いけません","vi":"được phép … / không được …","exJp":"ここで たばこを すっては いけません。","exRo":"koko de tabako o sutte wa ikemasen.","exVi":"Không được hút thuốc ở đây.","note":"Xin phép: Vても いいですか. Đồng ý: ええ、いいですよ.","qs":[{"s":"まどを あけて＿＿ いいですか。","a":"も","o":["は","が","を"],"ro":"mado o akete mo ii desu ka.","vi":"Tôi mở cửa sổ được không?"},{"s":"テストの とき、じしょを みて＿＿ いけません。","a":"は","o":["も","が","を"],"ro":"tesuto no toki, jisho o mite wa ikemasen.","vi":"Khi làm kiểm tra không được xem từ điển."}]},{"id":"G20","cat":"Thể て・た","pat":"Vて います","vi":"đang … / trạng thái","exJp":"いま あめが ふって います。","exRo":"ima ame ga futte imasu.","exVi":"Bây giờ trời đang mưa.","note":"Còn diễn tả trạng thái kéo dài: けっこんして います (đã kết hôn), ハノイに すんで います (đang sống ở Hà Nội).","qs":[{"s":"いま なにを して＿＿か。","a":"います","o":["ください","いけません","あります"],"ro":"ima nani o shite imasu ka.","vi":"Bây giờ bạn đang làm gì?"},{"s":"あねは ハノイに すんで＿＿。","a":"います","o":["あります","です","ください"],"ro":"ane wa Hanoi ni sunde imasu.","vi":"Chị tôi sống ở Hà Nội."}]},{"id":"G21","cat":"Thể て・た","pat":"Vて、Vて… / Vて から","vi":"làm A rồi làm B / làm xong A mới B","exJp":"うちへ かえって から、しゅくだいを します。","exRo":"uchi e kaette kara, shukudai o shimasu.","exVi":"Về nhà rồi tôi mới làm bài tập.","note":"Thì của cả câu nằm ở động từ cuối. Vてから nhấn mạnh A xong rồi mới đến B.","qs":[{"s":"あさ おきて、かおを あらって、がっこうへ ＿＿。","a":"いきます","o":["いって","いきて","いったり"],"ro":"asa okite, kao o aratte, gakkou e ikimasu.","vi":"Buổi sáng tôi dậy, rửa mặt rồi đi học."},{"s":"ごはんを たべて＿＿、くすりを のみます。","a":"から","o":["まで","まえに","ので"],"ro":"gohan o tabete kara, kusuri o nomimasu.","vi":"Ăn cơm xong rồi mới uống thuốc."}]},{"id":"G22","cat":"Thể て・た","pat":"Vたり Vたり します","vi":"làm những việc như … (liệt kê vài hành động)","exJp":"にちようびは そうじを したり、かいものを したり します。","exRo":"nichiyoubi wa souji o shitari, kaimono o shitari shimasu.","exVi":"Chủ nhật tôi làm những việc như dọn dẹp, đi mua sắm.","note":"Thể た + り. Cuối mẫu luôn có します. Nhiều giáo trình xếp ở đầu N4.","qs":[{"s":"やすみの ひは えいがを み＿＿、ほんを よんだり します。","a":"たり","o":["て","たい","ながら"],"ro":"yasumi no hi wa eiga o mitari, hon o yondari shimasu.","vi":"Ngày nghỉ tôi xem phim, đọc sách…"},{"s":"うたを うたったり、ダンスを ＿＿ しました。","a":"したり","o":["して","する","した"],"ro":"uta o utattari, dansu o shitari shimashita.","vi":"Chúng tôi đã hát, nhảy…"}]},{"id":"G23","cat":"Thể て・た","pat":"Vた ことが あります","vi":"đã từng …","exJp":"すしを たべた ことが あります。","exRo":"sushi o tabeta koto ga arimasu.","exVi":"Tôi đã từng ăn sushi.","note":"Phủ định: Vた ことが ありません (chưa từng). Nhiều giáo trình xếp ở đầu N4.","qs":[{"s":"ふじさんに のぼった＿＿が あります。","a":"こと","o":["もの","とき","ところ"],"ro":"fujisan ni nobotta koto ga arimasu.","vi":"Tôi đã từng leo núi Phú Sĩ."},{"s":"にほんへ ＿＿ ことが ありません。","a":"いった","o":["いく","いって","いきます"],"ro":"nihon e itta koto ga arimasen.","vi":"Tôi chưa từng đi Nhật."}]},{"id":"G24","cat":"Mẫu câu khác","pat":"〜とき / Vる まえに / Vた あとで","vi":"khi … / trước khi … / sau khi …","exJp":"ねる まえに、はを みがきます。","exRo":"neru mae ni, ha o migakimasu.","exVi":"Trước khi ngủ, tôi đánh răng.","note":"とき: い-adj + とき, な-adj + な + とき, N + の + とき. まえに đi với Vる hoặc N + の. あとで đi với Vた hoặc N + の.","qs":[{"s":"ひまな＿＿、ほんを よみます。","a":"とき","o":["まえに","あとで","から"],"ro":"hima na toki, hon o yomimasu.","vi":"Lúc rảnh tôi đọc sách."},{"s":"ごはんを ＿＿ あとで、さんぽします。","a":"たべた","o":["たべる","たべて","たべます"],"ro":"gohan o tabeta ato de, sanpo shimasu.","vi":"Ăn cơm xong tôi đi dạo."}]},{"id":"G25","cat":"Mẫu câu khác","pat":"もう Vました / まだ Vて いません","vi":"đã … rồi / vẫn chưa …","exJp":"A: もう しゅくだいを しましたか。B: いいえ、まだです。","exRo":"A: mou shukudai o shimashita ka. B: iie, mada desu.","exVi":"A: Bạn làm bài tập chưa? B: Chưa.","note":"Trả lời “chưa” dùng まだ Vて いません (hoặc ngắn gọn まだです), không dùng まだ Vませんでした.","qs":[{"s":"もう ひるごはんを ＿＿か。","a":"たべました","o":["たべません","たべたい","たべましょう"],"ro":"mou hirugohan o tabemashita ka.","vi":"Bạn đã ăn trưa chưa?"},{"s":"いいえ、まだ ＿＿。","a":"たべて いません","o":["たべませんでした","たべました","たべたいです"],"ro":"iie, mada tabete imasen.","vi":"Chưa, tôi vẫn chưa ăn."}]},{"id":"G26","cat":"Động từ","pat":"N に あげます / N に(から) もらいます","vi":"cho, tặng / nhận","exJp":"ともだちに はなを あげました。","exRo":"tomodachi ni hana o agemashita.","exVi":"Tôi đã tặng hoa cho bạn.","note":"あげます: người cho làm chủ ngữ. もらいます: người nhận làm chủ ngữ, người cho đi với に hoặc から.","qs":[{"s":"わたしは ははに セーターを ＿＿。（mẹ cho tôi）","a":"もらいました","o":["あげました","かしました","おしえました"],"ro":"watashi wa haha ni seetaa o moraimashita.","vi":"Tôi được mẹ cho cái áo len."},{"s":"わたしは ミンさん＿＿ ほんを あげました。","a":"に","o":["を","で","から"],"ro":"watashi wa Min-san ni hon o agemashita.","vi":"Tôi đã tặng sách cho bạn Minh."}]},{"id":"G27","cat":"Tính từ & phó từ","pat":"N が すき・きらい・じょうず・へた・できます・わかります","vi":"thích / ghét / giỏi / kém / làm được / hiểu","exJp":"わたしは りょうりが じょうずです。","exRo":"watashi wa ryouri ga jouzu desu.","exVi":"Tôi nấu ăn giỏi.","note":"Đối tượng của các từ này dùng が, không dùng を.","qs":[{"s":"わたしは ねこ＿＿ すきです。","a":"が","o":["を","に","で"],"ro":"watashi wa neko ga suki desu.","vi":"Tôi thích mèo."},{"s":"ミンさんは ピアノ＿＿ できます。","a":"が","o":["を","で","へ"],"ro":"Min-san wa piano ga dekimasu.","vi":"Bạn Minh biết chơi piano."}]},{"id":"G28","cat":"Tính từ & phó từ","pat":"い-adj / な-adj: hiện tại・phủ định・quá khứ・quá khứ phủ định","vi":"chia tính từ theo thì","exJp":"きのうは さむかったです。","exRo":"kinou wa samukatta desu.","exVi":"Hôm qua trời lạnh.","note":"い-adj: い→くない→かった→くなかった (ngoại lệ いい→よくない→よかった). な-adj: です→じゃ ありません→でした→じゃ ありませんでした. きれい, ゆうめい, きらい là な-adj.","qs":[{"s":"きのうの テストは ＿＿です。","a":"むずかしかった","o":["むずかしいでした","むずかしだった","むずかしくた"],"ro":"kinou no tesuto wa muzukashikatta desu.","vi":"Bài kiểm tra hôm qua khó."},{"s":"この へやは ＿＿。","a":"しずかじゃ ありません","o":["しずかくないです","しずかないです","しずかくありません"],"ro":"kono heya wa shizuka ja arimasen.","vi":"Căn phòng này không yên tĩnh."}]},{"id":"G29","cat":"Tính từ & phó từ","pat":"Adj + N / 〜くて・〜で","vi":"tính từ bổ nghĩa danh từ / nối: … và …","exJp":"ここは しずかで、きれいな まちです。","exRo":"koko wa shizuka de, kirei na machi desu.","exVi":"Đây là thị trấn yên tĩnh và sạch đẹp.","note":"い-adj + N: たかい やま. な-adj + な + N: きれいな へや. Nối câu: い→くて (やすくて), な-adj/N + で (しずかで).","qs":[{"s":"あれは ゆうめい＿＿ レストランです。","a":"な","o":["の","い","で"],"ro":"are wa yuumei na resutoran desu.","vi":"Kia là nhà hàng nổi tiếng."},{"s":"この みせは ＿＿、おいしいです。","a":"やすくて","o":["やすいで","やすくで","やすいて"],"ro":"kono mise wa yasukute, oishii desu.","vi":"Quán này rẻ và ngon."}]},{"id":"G30","cat":"Tính từ & phó từ","pat":"い-adj(く) / な-adj・N(に) + なります","vi":"trở nên …","exJp":"さむく なりました。","exRo":"samuku narimashita.","exVi":"Trời đã trở lạnh.","note":"い→く: おおきく なる. な-adj/N + に: げんきに なる, せんせいに なる.","qs":[{"s":"へやが きれい＿＿ なりました。","a":"に","o":["く","で","な"],"ro":"heya ga kirei ni narimashita.","vi":"Căn phòng đã trở nên sạch đẹp."},{"s":"なつは あつ＿＿ なります。","a":"く","o":["に","い","くて"],"ro":"natsu wa atsuku narimasu.","vi":"Mùa hè trời trở nên nóng."}]},{"id":"G31","cat":"Tính từ & phó từ","pat":"あまり / ぜんぜん + phủ định","vi":"không … lắm / hoàn toàn không","exJp":"この えいがは あまり おもしろくないです。","exRo":"kono eiga wa amari omoshirokunai desu.","exVi":"Phim này không hay lắm.","note":"Hai từ này đi với thể phủ định. Mức độ: とても > すこし > あまり〜ない > ぜんぜん〜ない.","qs":[{"s":"おさけは ぜんぜん ＿＿。","a":"のみません","o":["のみます","のみました","のみたいです"],"ro":"osake wa zenzen nomimasen.","vi":"Tôi hoàn toàn không uống rượu."},{"s":"きょうは ＿＿ さむくないです。","a":"あまり","o":["とても","よく","たくさん"],"ro":"kyou wa amari samukunai desu.","vi":"Hôm nay không lạnh lắm."}]},{"id":"G32","cat":"Mẫu câu khác","pat":"A は B より〜 / A と B と どちらが〜 / A の ほうが〜 / N の なかで 〜が いちばん〜","vi":"hơn / cái nào hơn / A thì hơn / nhất","exJp":"ベトナムは にほんより あついです。","exRo":"Betonamu wa nihon yori atsui desu.","exVi":"Việt Nam nóng hơn Nhật Bản.","note":"Hỏi giữa 2 thứ dùng どちら. Từ 3 thứ trở lên dùng なに/どこ/だれ + が いちばん.","qs":[{"s":"ちかてつは バス＿＿ はやいです。","a":"より","o":["から","ほう","で"],"ro":"chikatetsu wa basu yori hayai desu.","vi":"Tàu điện ngầm nhanh hơn xe buýt."},{"s":"ねこと いぬと ＿＿が すきですか。","a":"どちら","o":["どれ","どこ","なに"],"ro":"neko to inu to dochira ga suki desu ka.","vi":"Mèo và chó, bạn thích con nào hơn?"},{"s":"くだものの なか＿＿ なにが いちばん すきですか。","a":"で","o":["に","が","を"],"ro":"kudamono no naka de nani ga ichiban suki desu ka.","vi":"Trong các loại trái cây, bạn thích loại nào nhất?"}]},{"id":"G33","cat":"Mẫu câu khác","pat":"N が あります・います / N は (vị trí) に あります・います","vi":"có … / … ở …","exJp":"ねこは つくえの したに います。","exRo":"neko wa tsukue no shita ni imasu.","exVi":"Con mèo ở dưới gầm bàn.","note":"あります: đồ vật, cây cối. います: người, động vật. Từ vị trí: うえ・した・まえ・うしろ・なか・そと・みぎ・ひだり・となり・ちかく.","qs":[{"s":"こうえんに こどもが ＿＿。","a":"います","o":["あります","です","いきます"],"ro":"kouen ni kodomo ga imasu.","vi":"Ở công viên có trẻ con."},{"s":"ほんは つくえの うえ＿＿ あります。","a":"に","o":["で","を","へ"],"ro":"hon wa tsukue no ue ni arimasu.","vi":"Quyển sách ở trên bàn."}]},{"id":"G34","cat":"Mẫu câu khác","pat":"〜から (vì) / 〜が (nhưng) / でも","vi":"vì … nên / … nhưng … / tuy nhiên","exJp":"にほんごは むずかしいですが、おもしろいです。","exRo":"nihongo wa muzukashii desu ga, omoshiroi desu.","exVi":"Tiếng Nhật khó nhưng thú vị.","note":"から đặt sau lý do: あめですから、いきません. でも đứng đầu câu sau: …。でも、…","qs":[{"s":"あめです＿＿、いきません。","a":"から","o":["が","まで","でも"],"ro":"ame desu kara, ikimasen.","vi":"Vì trời mưa nên tôi không đi."},{"s":"この くるまは たかいです＿＿、いいです。","a":"が","o":["から","と","で"],"ro":"kono kuruma wa takai desu ga, ii desu.","vi":"Chiếc xe này đắt nhưng tốt."}]},{"id":"G35","cat":"Mẫu câu khác","pat":"V (thể thường) / Adj + N","vi":"… (mà) … — mệnh đề bổ nghĩa cho danh từ","exJp":"これは きのう かった ほんです。","exRo":"kore wa kinou katta hon desu.","exVi":"Đây là quyển sách tôi mua hôm qua.","note":"Động từ đứng trước danh từ dùng thể thường (かう→かった), không dùng ます. Chủ ngữ trong mệnh đề đi với が: ははが つくった りょうり.","qs":[{"s":"これは わたしが ＿＿ ケーキです。","a":"つくった","o":["つくりました","つくって","つくりますの"],"ro":"kore wa watashi ga tsukutta keeki desu.","vi":"Đây là cái bánh tôi đã làm."},{"s":"あそこで ほんを ＿＿ ひとは だれですか。","a":"よんで いる","o":["よんで います","よんでの","よみますの"],"ro":"asoko de hon o yonde iru hito wa dare desu ka.","vi":"Người đang đọc sách ở đằng kia là ai?"}]},{"id":"G36","cat":"Mẫu câu khác","pat":"〜でしょう","vi":"có lẽ …","exJp":"あしたは あめが ふるでしょう。","exRo":"ashita wa ame ga furu deshou.","exVi":"Ngày mai có lẽ trời mưa.","note":"Đi sau thể thường của V / い-adj; với な-adj và N thì bỏ だ: しずかでしょう, あめでしょう.","qs":[{"s":"あしたは はれる＿＿。","a":"でしょう","o":["ましょう","ください","たいです"],"ro":"ashita wa hareru deshou.","vi":"Ngày mai có lẽ trời nắng."},{"s":"あしたは ＿＿でしょう。","a":"あめ","o":["あめだ","あめな","あめの"],"ro":"ashita wa ame deshou.","vi":"Ngày mai có lẽ mưa."}]},{"id":"G37","cat":"Mẫu câu khác","pat":"〜つ / 〜にん (ひとり・ふたり) / 〜まい / 〜ほん / 〜さつ / 〜ひき / 〜だい","vi":"cách đếm đồ vật, người, vật mỏng, vật dài, sách, con vật, máy móc","exJp":"りんごを ふたつ ください。","exRo":"ringo o futatsu kudasai.","exVi":"Cho tôi 2 quả táo.","note":"Số lượng đứng sau trợ từ, trước động từ. Đọc đặc biệt: ひとり, ふたり, いっぽん, さんぼん, ろっぽん.","qs":[{"s":"きょうしつに がくせいが ＿＿ います。（2 người）","a":"ふたり","o":["ふたつ","ににん","にまい"],"ro":"kyoushitsu ni gakusei ga futari imasu.","vi":"Trong lớp có 2 học sinh."},{"s":"きってを 3＿＿ ください。","a":"まい","o":["ほん","さつ","ひき"],"ro":"kitte o sanmai kudasai.","vi":"Cho tôi 3 con tem."}]}];
+const G_CATS = [...new Set(GRAMMAR.map(g => g.cat))];
+let gCat = "all", GQ = null;
+const gRomaji = s => ({ "は": "wa", "へ": "e", "を": "o" })[s] || romaji(s);
+const gItemsIn = () => GRAMMAR.filter(g => gCat === "all" || g.cat === gCat);
+function renderGrammarList() {
+  $("gCount").textContent = GRAMMAR.length;
+  $("gCats").innerHTML = [["all", "Tất cả"], ...G_CATS.map(c => [c, c])].map(([v, l]) =>
+    `<button class="chip" data-v="${v}" aria-pressed="${v === gCat}">${l}<small>${v === "all" ? GRAMMAR.length : GRAMMAR.filter(g => g.cat === v).length}</small></button>`).join("");
+  $("gItems").innerHTML = gItemsIn().map(g => `
+    <details class="gitem">
+      <summary class="gsum"><span class="gid">${g.id}</span><span class="gpat">${g.pat}</span><span class="gvi">${g.vi}</span></summary>
+      <div class="gbody">
+        <div class="ex">
+          <span class="exl">Ví dụ</span>
+          <div class="exj">${g.exJp}</div>
+          <div class="exr">${g.exRo}</div>
+          <div class="exv">${g.exVi}</div>
+        </div>
+        <p class="gnote">${g.note}</p>
+        <button class="ghost" data-practice="${g.id}">Luyện mẫu này · ${g.qs.length} câu</button>
+      </div>
+    </details>`).join("");
+  const n = gItemsIn().reduce((s, g) => s + g.qs.length, 0);
+  $("gStart").textContent = `Luyện ${gCat === "all" ? "tất cả" : "nhóm này"} · ${n} câu`;
+}
+$("gCats").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; gCat = b.dataset.v; renderGrammarList(); });
+$("gItems").addEventListener("click", e => {
+  const b = e.target.closest("[data-practice]"); if (!b) return;
+  startGrammar(GRAMMAR.filter(g => g.id === b.dataset.practice));
+});
+$("gStart").addEventListener("click", () => startGrammar(gItemsIn()));
+
+function gShow(which) {
+  $("gList").hidden = which !== "list"; $("gQuiz").hidden = which !== "quiz"; $("gRes").hidden = which !== "res";
+  window.scrollTo({ top: 0 });
+}
+function startGrammar(items) {
+  const qs = shuffle(items.flatMap(g => g.qs.map((q, i) => ({ key: g.id + "-" + i, g, q }))));
+  GQ = { items, all: qs, queue: qs.slice(), total: qs.length, done: new Set(), first: new Map(), wrong: new Set(), cur: null, opts: [], locked: false, repeat: false, asked: 0 };
+  gShow("quiz"); gNext();
+}
+function gNext() {
+  if (!GQ.queue.length) return gFinish();
+  const it = GQ.queue.shift();
+  GQ.cur = it; GQ.locked = false; GQ.repeat = GQ.first.has(it.key);
+  GQ.opts = shuffle([it.q.a, ...it.q.o]);
+  $("gTag").textContent = it.g.id + " · " + it.g.cat;
+  $("gAgain").hidden = !GQ.repeat;
+  $("gPrompt").innerHTML = `<div class="gsent">${it.q.s.replace("＿＿", '<span class="blank">＿＿</span>')}</div><div class="ghint">${it.q.vi}</div>`;
+  $("gOpts").innerHTML = GQ.opts.map((o, i) => `<button class="opt" id="gopt${i}"><span class="n">${i + 1}</span><span class="t"><span class="gj">${o}</span><span class="jr">${gRomaji(o)}</span></span></button>`).join("");
+  GQ.opts.forEach((_, i) => $("gopt" + i).addEventListener("click", () => gAnswer(i)));
+  $("gFb").hidden = true; $("gUnder").hidden = false;
+  gBar();
+}
+function gBar() {
+  $("gFill").style.width = (GQ.total ? GQ.done.size / GQ.total * 100 : 0) + "%";
+  $("gCountQ").textContent = `${GQ.done.size} / ${GQ.total}`;
+}
+function gAnswer(i) {
+  if (GQ.locked) return;
+  GQ.locked = true; GQ.asked++;
+  const it = GQ.cur, ci = GQ.opts.indexOf(it.q.a), ok = i === ci;
+  GQ.opts.forEach((_, k) => { const b = $("gopt" + k); b.disabled = true; b.classList.add(k === ci ? "right" : k === i ? "wrong" : "dim"); });
+  if (!GQ.first.has(it.key)) GQ.first.set(it.key, ok);
+  if (ok) GQ.done.add(it.key);
+  else {
+    GQ.wrong.add(it.key);
+    if (S.requeue) GQ.queue.splice(Math.min(GQ.queue.length, 3 + (Math.random() * 3 | 0)), 0, it);
+    else GQ.done.add(it.key);
+  }
+  gBar();
+  $("gUnder").hidden = true;
+  $("gPrompt").querySelector(".gsent").innerHTML = it.q.s.replace("＿＿", `<span class="gfill ${ok ? "ok" : "no"}">${it.q.a}</span>`);
+  const fb = $("gFb");
+  fb.className = "fb " + (ok ? "ok" : "no");
+  fb.innerHTML = `
+    <div class="verdict">${ok ? rand(OK_MSG) : (i < 0 ? "Đáp án đúng là: " : "Đáp án đúng: ") + (ok ? "" : it.q.a)}</div>
+    <div class="ex" style="border-top:0;padding-top:0">
+      <div class="exr">${it.q.ro}</div>
+      <div class="exv">${it.q.vi}</div>
+    </div>
+    <div class="gpoint"><span class="gid">${it.g.id} · ${it.g.cat}</span><span class="gpat">${it.g.pat}</span><p>${it.g.note}</p></div>
+    <div class="fbrow">
+      <span class="hint">${!ok && S.requeue ? "Câu này sẽ được hỏi lại sau vài câu. " : ""}Bấm Enter hoặc nút bên cạnh để qua câu.</span>
+      <button class="go" id="gNextBtn">Tiếp tục</button>
+    </div>`;
+  fb.hidden = false;
+  const n = $("gNextBtn"); n.addEventListener("click", gNext); n.focus({ preventScroll: true });
+}
+function gFinish() {
+  const keys = [...GQ.first.keys()], firstOk = keys.filter(k => GQ.first.get(k)).length;
+  const pct = keys.length ? Math.round(firstOk / keys.length * 100) : 0;
+  const weakIds = [...new Set([...GQ.wrong].map(k => k.split("-")[0]))];
+  const weak = GRAMMAR.filter(g => weakIds.includes(g.id));
+  $("gRes").innerHTML = `
+    <div><h2>${!keys.length ? "Chưa trả lời câu nào" : pct === 100 ? "Ngữ pháp chuẩn chỉnh!" : pct >= 80 ? "Rất tốt, còn vài chỗ cần ôn." : pct >= 50 ? "Đang tiến bộ, xem lại các mẫu sai nhé." : "Ôn lại các mẫu bên dưới rồi luyện tiếp nhé."}</h2>
+      <p class="sub">${GQ.done.size < GQ.total ? `Bạn dừng giữa chừng, xong ${GQ.done.size}/${GQ.total} câu.` : `Bạn đã làm xong ${GQ.total} câu.`}</p></div>
+    <div class="stats">
+      <div class="stat hi"><div class="v">${pct}%</div><div class="k">đúng ngay lần đầu</div></div>
+      <div class="stat"><div class="v">${firstOk}/${keys.length}</div><div class="k">câu đúng lần đầu</div></div>
+      <div class="stat"><div class="v">${weak.length}</div><div class="k">mẫu cần ôn</div></div>
+    </div>
+    ${weak.length ? `<div class="miss"><h3>Mẫu cần ôn</h3><div class="misslist">${weak.map(g =>
+      `<div class="mrow"><div class="a" style="font-size:1rem">${g.pat}</div><div class="b">${g.id}</div><div class="c">${g.vi}</div></div>`).join("")}</div></div>`
+      : (keys.length ? `<div class="perfect">Không sai câu nào trong lượt này.</div>` : "")}
+    <div class="actions">
+      ${weak.length ? `<button class="go" id="gRetryWeak">Luyện lại ${weak.length} mẫu sai</button>` : ""}
+      <button class="${weak.length ? "ghost" : "go"}" id="gRetry">Làm lại lượt này</button>
+      <button class="ghost" id="gBack">Về danh sách</button>
+    </div>`;
+  gShow("res");
+  const items = GQ.items;
+  if (weak.length) $("gRetryWeak").addEventListener("click", () => startGrammar(weak));
+  $("gRetry").addEventListener("click", () => startGrammar(items));
+  $("gBack").addEventListener("click", () => gShow("list"));
+}
+$("gDunno").addEventListener("click", () => gAnswer(-1));
+$("gQuit").addEventListener("click", () => gFinish());
+document.addEventListener("keydown", e => {
+  if (VIEW !== "grammar" || $("gQuiz").hidden || !GQ || e.metaKey || e.ctrlKey || e.altKey) return;
+  if (!GQ.locked) {
+    if (/^[1-4]$/.test(e.key) && +e.key <= GQ.opts.length) { e.preventDefault(); gAnswer(+e.key - 1); }
+    else if (e.key === "0") { e.preventDefault(); gAnswer(-1); }
+  } else if (e.key === "Enter" || e.key === " ") { e.preventDefault(); gNext(); }
+  if (e.key === "Escape") gFinish();
+});
+renderGrammarList();
 
 $("btnStart").addEventListener("click", () => { const p = poolWords(); if (p.length) startSession(p); });
 $("btnDunno").addEventListener("click", () => answer(-1));
