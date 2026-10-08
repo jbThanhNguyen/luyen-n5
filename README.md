@@ -10,7 +10,7 @@ Web app ôn từ vựng JLPT N5 theo kiểu Quizlet, giao diện tối chủ đ�
 - **Hỏi lại câu sai**: từ trả lời sai sẽ được hỏi lại sau vài câu, đến khi đúng thì thôi.
 - **Đáp án có ví dụ**: mỗi đáp án kèm một câu ví dụ, có hiragana đặt kế bên kanji, romaji và nghĩa tiếng Việt.
 - **Bảng chữ**: Hiragana và Katakana (âm cơ bản, âm đục, âm ghép), có chế độ che romaji để tự kiểm tra.
-- **49 Kanji N5**: mỗi chữ có âm Hán Việt, âm On, âm Kun, ví dụ, và các từ vựng chứa chữ đó.
+- **88 Kanji**: đủ 79 chữ N5 chuẩn, cộng 9 chữ N4 hay gặp (có nhãn N4, lọc được theo cấp độ). Mỗi chữ có âm Hán Việt, âm On, âm Kun, ví dụ, và các từ vựng chứa chữ đó.
 - **37 mẫu ngữ pháp N5** chia 6 nhóm: mỗi mẫu có ví dụ, romaji, ghi chú. Có 75 câu trắc nghiệm điền chỗ trống, sai thì hỏi lại, kèm giải thích mẫu ngữ pháp.
 - **Dữ liệu cho học máy**: mỗi lần trả lời được ghi thành một dòng (29 cột). Bấm nút để xuất file CSV.
 
@@ -46,6 +46,6 @@ y = df["correct"]   # nhãn: 1 = đúng, 0 = sai
 ## Nguồn dữ liệu
 
 - `Tu_vung_JLPT_N5_A-Z.xlsx`: 295 từ, còn 293 từ sau khi gộp các dòng trùng. Đã sửa romaji của 九月 thành `kugatsu`.
-- `Kanji_N5_co_ban.xlsx`: 49 kanji. Phần âm Hán Việt được bổ sung thêm.
+- `Kanji_N5_co_ban.xlsx`: 49 kanji ban đầu, bổ sung thêm 39 chữ cho đủ bộ 79 chữ N5 chuẩn (tổng 88), thêm cột Hán Việt và Cấp độ.
 - `N5_Grammar_Tong_Hop.xlsx`: 46 mẫu gốc cộng 18 mẫu bổ sung, gộp lại còn 37 mẫu (cột `Merged_From` ghi mẫu cũ nằm ở đâu).
 - Câu ví dụ được viết riêng cho bộ từ này. Cách đọc và romaji đã được kiểm tra bằng máy.
