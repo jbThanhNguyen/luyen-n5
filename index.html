@@ -456,6 +456,7 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
       <button class="go" id="btnCsv">Tải CSV</button>
       <button class="ghost" id="btnCopy">Sao chép CSV</button>
       <button class="ghost danger" id="btnWipe">Xoá dữ liệu</button>
+      <button class="ghost" id="btnOwnerOff" title="Khung này sẽ ẩn trên trình duyệt này cho tới khi bạn mở lại bằng link riêng">Ẩn khung này trên máy này</button>
     </div>
     <p class="dmsg" id="dmsg" aria-live="polite"></p>
     <details class="cols">
@@ -1033,6 +1034,7 @@ function finish() {
     <div class="stat"><div class="v">${firstOk}/${total}</div><div class="k">từ đúng lần đầu</div></div>
     <div class="stat"><div class="v">${mm}:${ss}</div><div class="k">thời gian · ${Q.asked} lượt trả lời</div></div>`;
 
+  $("resLogged").hidden = !OWNER;
   $("resLogged").textContent = Q.logRows.length
     ? `Đã ghi ${Q.logRows.length} dòng vào dữ liệu học máy (tổng ${LOG.length} dòng).` : "";
   queueSync();
@@ -1057,7 +1059,7 @@ function finish() {
 /* ---------- screens & keys ---------- */
 function show(id) {
   ["scrSetup", "scrQuiz", "scrRes"].forEach(s => $(s).hidden = s !== id);
-  $("scrData").hidden = id !== "scrSetup";
+  $("scrData").hidden = id !== "scrSetup" || !OWNER;
   if (id === "scrSetup") { renderMeter(); renderSub(); renderStart(); renderData(); }
   else renderMeter();
   window.scrollTo({ top: 0 });
@@ -1354,6 +1356,31 @@ $("btnCopy").addEventListener("click", copyCsv);
 $("btnWipe").addEventListener("click", wipeData);
 $("colTable").innerHTML = LOG_COLS.map(([c, d]) => `<tr><td>${c}</td><td>${d}</td></tr>`).join("");
 
+/* ---------- owner-only ML panel ----------
+   Khung dữ liệu chỉ hiện cho chủ app: trên link Claude thì nhận diện chủ sở hữu,
+   còn ở bản tự host thì mở bằng link riêng (#mã-bí-mật). Trang chỉ lưu mã băm SHA-256, không lưu mã gốc. */
+const OWNER_KEY = "n5space.owner";
+const OWNER_HASH = "dffe1923df0b68aa1d63be3401b31a75f0d57baac2583f1c9d1a010e3be1a3a4";
+let OWNER = store.get(OWNER_KEY, false) === true;
+function setOwner(on) {
+  OWNER = on; store.set(OWNER_KEY, on);
+  $("scrData").hidden = !on || $("scrSetup").hidden;
+  if (on) renderData();
+}
+(async () => {
+  const h = (location.hash || "").slice(1);
+  if (!h || !(window.crypto && crypto.subtle)) return;
+  try {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(h));
+    const hex = [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+    if (hex === OWNER_HASH) {
+      setOwner(true);
+      try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+    }
+  } catch (e) {}
+})();
+$("btnOwnerOff").addEventListener("click", () => setOwner(false));
+
 show("scrSetup");
 setView(S.view || "quiz");
 
@@ -1363,7 +1390,8 @@ setView(S.view || "quiz");
   try { DL = await window.claude.use("downloads"); } catch (e) { DL = null; }
   let owner = false;
   try { const U = await window.claude.use("user"); owner = U ? await U.isOwner() : false; } catch (e) { owner = false; }
-  if (!owner) return; // người khác mở link: chỉ lưu trên trình duyệt của họ
+  if (!owner) return; // người khác mở link: không thấy khung dữ liệu, không đọc log trên trang
+  setOwner(true);
   try { DB = await window.claude.use("db"); } catch (e) { DB = null; }
   if (!DB) return;
   try {

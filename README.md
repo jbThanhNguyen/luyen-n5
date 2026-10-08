@@ -12,7 +12,7 @@ Web app ôn từ vựng JLPT N5 theo kiểu Quizlet, giao diện tối chủ đ�
 - **Bảng chữ**: Hiragana và Katakana (âm cơ bản, âm đục, âm ghép), có chế độ che romaji để tự kiểm tra.
 - **88 Kanji**: đủ 79 chữ N5 chuẩn, cộng 9 chữ N4 hay gặp (có nhãn N4, lọc được theo cấp độ). Mỗi chữ có âm Hán Việt, âm On, âm Kun, ví dụ, và các từ vựng chứa chữ đó.
 - **37 mẫu ngữ pháp N5** chia 6 nhóm: mỗi mẫu có ví dụ, romaji, ghi chú. Có 75 câu trắc nghiệm điền chỗ trống, sai thì hỏi lại, kèm giải thích mẫu ngữ pháp.
-- **Dữ liệu cho học máy**: mỗi lần trả lời được ghi thành một dòng (29 cột). Bấm nút để xuất file CSV.
+- **Dữ liệu cho học máy**: mỗi lần trả lời được ghi thành một dòng (29 cột). Bấm nút để xuất file CSV. Khung này chỉ hiện với chủ app; người khác dùng app bình thường nhưng không thấy và không xuất được dữ liệu.
 
 ## Cách dùng
 
@@ -24,7 +24,7 @@ Web app ôn từ vựng JLPT N5 theo kiểu Quizlet, giao diện tối chủ đ�
 
 ## Dữ liệu học máy
 
-Nhập **Tên người học** trước khi làm bài, sau đó bấm **Tải CSV** ở màn hình chính.
+Khung **Dữ liệu cho học máy** chỉ hiện với chủ app. Nhập **Tên người học** trước khi làm bài, sau đó bấm **Tải CSV** ở màn hình chính.
 
 ```python
 import pandas as pd, glob
