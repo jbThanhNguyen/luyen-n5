@@ -12,7 +12,7 @@ Web app ôn từ vựng, kanji, ngữ pháp JLPT N5 và N4 theo kiểu Quizlet, 
 - **Đáp án có ví dụ**: mỗi từ N5 kèm một câu ví dụ, có hiragana đặt kế bên kanji, romaji và nghĩa tiếng Việt.
 - **Bảng chữ**: Hiragana và Katakana (âm cơ bản, âm đục, âm ghép), có chế độ che romaji để tự kiểm tra.
 - **246 Kanji**: 79 chữ N5 chuẩn và 167 chữ N4. Ở chế độ N5+N4 có nhãn cấp và lọc được theo cấp. Mỗi chữ có âm Hán Việt, âm On, âm Kun, ví dụ, và các từ vựng chứa chữ đó.
-- **Ngữ pháp: 37 mẫu N5 (75 câu luyện) và 85 mẫu N4 (137 câu luyện)**. N4 theo Minna no Nihongo bài 26–50, lọc được theo từng bài. Mỗi mẫu có ví dụ (N4 kèm furigana), romaji, ghi chú; trắc nghiệm điền chỗ trống, sai thì hỏi lại, kèm giải thích mẫu ngữ pháp.
+- **Ngữ pháp: 37 mẫu N5 (75 câu luyện) và 93 mẫu N4 (148 câu luyện)**. N4 theo Minna no Nihongo bài 25–50, lọc được theo từng bài. Mỗi mẫu có ví dụ (N4 kèm furigana), romaji, ghi chú; trắc nghiệm điền chỗ trống, sai thì hỏi lại, kèm giải thích mẫu ngữ pháp.
 - **Dữ liệu cho học máy**: mỗi lần trả lời được ghi thành một dòng (30 cột, có cột `level`). Bấm nút để xuất file CSV. Khung này chỉ hiện với chủ app; người khác dùng app bình thường nhưng không thấy và không xuất được dữ liệu.
 
 ## Cách dùng
