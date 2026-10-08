@@ -1268,7 +1268,7 @@ function renderGrammarList() {
       <div class="gbody">
         <div class="ex">
           <span class="exl">Ví dụ</span>
-          <div class="exj">${g.exJp}</div>
+          <div class="exj">${furi(g.exJp)}</div>
           <div class="exr">${g.exRo}</div>
           <div class="exv">${g.exVi}</div>
         </div>
@@ -1302,7 +1302,7 @@ function gNext() {
   GQ.opts = shuffle([it.q.a, ...it.q.o]);
   $("gTag").textContent = it.g.id + " · " + it.g.cat;
   $("gAgain").hidden = !GQ.repeat;
-  $("gPrompt").innerHTML = `<div class="gsent">${it.q.s.replace("＿＿", '<span class="blank">＿＿</span>')}</div><div class="ghint">${it.q.vi}</div>`;
+  $("gPrompt").innerHTML = `<div class="gsent">${furi(it.q.s).replace("＿＿", '<span class="blank">＿＿</span>')}</div><div class="ghint">${it.q.vi}</div>`;
   $("gOpts").innerHTML = GQ.opts.map((o, i) => `<button class="opt" id="gopt${i}"><span class="n">${i + 1}</span><span class="t"><span class="gj">${o}</span><span class="jr">${gRomaji(o)}</span></span></button>`).join("");
   GQ.opts.forEach((_, i) => $("gopt" + i).addEventListener("click", () => gAnswer(i)));
   $("gFb").hidden = true; $("gUnder").hidden = false;
@@ -1326,7 +1326,7 @@ function gAnswer(i) {
   }
   gBar();
   $("gUnder").hidden = true;
-  $("gPrompt").querySelector(".gsent").innerHTML = it.q.s.replace("＿＿", `<span class="gfill ${ok ? "ok" : "no"}">${it.q.a}</span>`);
+  $("gPrompt").querySelector(".gsent").innerHTML = furi(it.q.s).replace("＿＿", `<span class="gfill ${ok ? "ok" : "no"}">${it.q.a}</span>`);
   const fb = $("gFb");
   fb.className = "fb " + (ok ? "ok" : "no");
   fb.innerHTML = `
