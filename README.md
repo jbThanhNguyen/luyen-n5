@@ -6,13 +6,14 @@ Web app ôn từ vựng, kanji, ngữ pháp JLPT N5 và N4 theo kiểu Quizlet, 
 
 ## Tính năng
 
-- **Chọn cấp N5 / N4 / N5+N4** ở góc trên. Lựa chọn được nhớ lại; cũng có thể mở thẳng bằng link `?level=n4`. Chế độ N5+N4 trộn cả hai bộ để ôn tổng.
+- **Chọn cấp N5 / N4 / N5+N4** ở góc trên. Lựa chọn được nhớ lại; cũng có thể mở thẳng bằng link `?level=n4`. Chế độ N5+N4 trộn cả hai bộ để ôn tổng. Mỗi cấp có một bộ màu riêng: N5 vũ trụ đêm (vàng), N4 dạ anh đào (hồng, có cánh hoa rơi), N5+N4 cực quang (xanh).
 - **Trắc nghiệm 293 từ N5 và 798 từ N4**: 4 đáp án, chọn hướng Nhật → Việt, Việt → Nhật hoặc trộn cả hai. Lọc từ theo phần, chữ cái đầu, từ loại hoặc nhóm "từ hay sai".
 - **Hỏi lại câu sai**: từ trả lời sai sẽ được hỏi lại sau vài câu, đến khi đúng thì thôi.
 - **Đáp án có ví dụ**: mỗi từ N5 kèm một câu ví dụ, có hiragana đặt kế bên kanji, romaji và nghĩa tiếng Việt.
 - **Bảng chữ**: Hiragana và Katakana (âm cơ bản, âm đục, âm ghép), có chế độ che romaji để tự kiểm tra.
 - **246 Kanji**: 79 chữ N5 chuẩn và 167 chữ N4. Ở chế độ N5+N4 có nhãn cấp và lọc được theo cấp. Mỗi chữ có âm Hán Việt, âm On, âm Kun, ví dụ, và các từ vựng chứa chữ đó.
 - **Ngữ pháp: 37 mẫu N5 (75 câu luyện) và 93 mẫu N4 (148 câu luyện)**. N4 theo Minna no Nihongo bài 25–50, lọc được theo từng bài. Mỗi mẫu có ví dụ (N4 kèm furigana), romaji, ghi chú; trắc nghiệm điền chỗ trống, sai thì hỏi lại, kèm giải thích mẫu ngữ pháp.
+- **Tự / tha động từ** (tab riêng): 57 cặp chia 9 nhóm (bật/tắt, hỏng/vỡ, di chuyển, tăng/giảm, nấu ăn…), mỗi cặp có câu ví dụ が / を kèm furigana và romaji, mẹo nhận biết qua đuôi động từ, 228 câu luyện: chọn động từ hợp với が/を, chọn trợ từ, tìm cặp.
 - **Dữ liệu cho học máy**: mỗi lần trả lời được ghi thành một dòng (30 cột, có cột `level`). Bấm nút để xuất file CSV. Khung này chỉ hiện với chủ app; người khác dùng app bình thường nhưng không thấy và không xuất được dữ liệu.
 
 ## Cách dùng
@@ -52,6 +53,7 @@ y = df["correct"]   # nhãn: 1 = đúng, 0 = sai
 index.html     giao diện + logic (không chứa dữ liệu)
 data/n5.js     window.JLPT.n5 = { words, kanji, grammar }
 data/n4.js     window.JLPT.n4 = { words, kanji, grammar }
+data/jita.js   window.JLPT.jita = { tips, items }   (cặp tự/tha động từ, dùng chung mọi cấp)
 ```
 
 Muốn sửa hay thêm từ, kanji, ngữ pháp thì chỉ cần sửa file trong `data/`, mỗi mục một dòng. Định dạng từng mảng ghi ở đầu mỗi file. Dữ liệu dùng file `.js` (không phải `.json`) để vẫn mở được bằng `file://` khi chạy offline.
