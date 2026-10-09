@@ -81,6 +81,9 @@ body::before {
     radial-gradient(44vmax 30vmax at 40% 100%, var(--neb-c), transparent 70%);
 }
 #sky { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.sakura-branch { display: none; position: fixed; top: 0; right: 0; width: min(380px, 52vw); height: auto; z-index: 0; pointer-events: none; opacity: .92; filter: drop-shadow(0 6px 18px rgba(255, 120, 170, .18)); }
+:root[data-level="n4"] .sakura-branch { display: block; }
+@media (max-width: 700px) { .sakura-branch { width: 44vw; top: -14px; opacity: .45; } }
 .wrap {
   position: relative; z-index: 1;
   max-width: 760px; margin: 0 auto;
@@ -421,6 +424,42 @@ details.cols summary:focus-visible { outline: 2px solid var(--gold); outline-off
 </style>
 
 <canvas id="sky" aria-hidden="true"></canvas>
+<svg class="sakura-branch" viewBox="0 0 360 250" aria-hidden="true">
+  <defs>
+    <g id="sk-bl">
+      <g fill="#ffc6dc">
+        <path d="M0 0C-6-4-8-13-3-17L0-14.5 3-17C8-13 6-4 0 0Z"/>
+        <path d="M0 0C-6-4-8-13-3-17L0-14.5 3-17C8-13 6-4 0 0Z" transform="rotate(72)"/>
+        <path d="M0 0C-6-4-8-13-3-17L0-14.5 3-17C8-13 6-4 0 0Z" transform="rotate(144)"/>
+        <path d="M0 0C-6-4-8-13-3-17L0-14.5 3-17C8-13 6-4 0 0Z" transform="rotate(216)"/>
+        <path d="M0 0C-6-4-8-13-3-17L0-14.5 3-17C8-13 6-4 0 0Z" transform="rotate(288)"/>
+      </g>
+      <circle r="3.2" fill="#ff7aa8"/>
+      <g fill="#ffe3a3"><circle cx="0" cy="-4.5" r=".9"/><circle cx="4.3" cy="-1.4" r=".9"/><circle cx="2.6" cy="3.6" r=".9"/><circle cx="-2.6" cy="3.6" r=".9"/><circle cx="-4.3" cy="-1.4" r=".9"/></g>
+    </g>
+    <g id="sk-bud"><ellipse rx="3.6" ry="5.2" fill="#ff9cc6"/><path d="M-3 3.5Q0 7 3 3.5" fill="none" stroke="#5b2a3b" stroke-width="1.4"/></g>
+  </defs>
+  <g fill="none" stroke="#3b1b2b" stroke-linecap="round">
+    <path d="M372 6C318 16 262 30 214 58 178 79 144 90 100 94 74 96 50 106 28 126" stroke-width="7"/>
+    <path d="M262 30C250 54 246 78 252 106" stroke-width="3.6"/>
+    <path d="M178 79C166 99 154 112 134 124" stroke-width="3.2"/>
+    <path d="M306 18C300 40 310 58 324 72" stroke-width="3"/>
+    <path d="M100 94C96 112 100 126 112 138" stroke-width="2.6"/>
+  </g>
+  <use href="#sk-bl" x="252" y="108" transform="rotate(12 252 108)"/>
+  <use href="#sk-bl" x="236" y="46"/>
+  <use href="#sk-bl" x="200" y="66" transform="rotate(-20 200 66)"/>
+  <use href="#sk-bl" x="134" y="124" transform="rotate(30 134 124)"/>
+  <use href="#sk-bl" x="324" y="74"/>
+  <use href="#sk-bl" x="150" y="88" transform="rotate(-8 150 88)"/>
+  <use href="#sk-bl" x="112" y="140"/>
+  <use href="#sk-bl" x="66" y="100" transform="rotate(20 66 100)"/>
+  <use href="#sk-bl" x="290" y="22"/>
+  <use href="#sk-bud" x="30" y="126" transform="rotate(-50 30 126)"/>
+  <use href="#sk-bud" x="176" y="100" transform="rotate(20 176 100)"/>
+  <use href="#sk-bud" x="266" y="70" transform="rotate(-15 266 70)"/>
+  <use href="#sk-bud" x="314" y="46" transform="rotate(30 314 46)"/>
+</svg>
 <main class="wrap">
   <header class="top">
     <div class="brand">
@@ -1564,7 +1603,53 @@ setView(S.view || "quiz");
   const LV = document.documentElement.dataset.level || "n5";
   const tints = LV === "n4" ? ["#ffffff", "#ffe0ee", "#ffe9c4"] : LV === "all" ? ["#ffffff", "#d6fff4", "#cfe6ff"] : ["#ffffff", "#dfe4ff", "#ffe9c4", "#c9d8ff"];
   const PETAL = ["#ffc1d9", "#ffd6e6", "#ffb0cf", "#fff0f6"];
-  let petals = [];
+  let petals = [], wind = 0, gust = null, mx = -1e9, my = -1e9;
+  /* 3 lớp xa – gần: lớp xa nhỏ, mờ, chậm; lớp gần to, rõ, nhanh. Thỉnh thoảng có cả bông hoa nguyên đóa. */
+  function mkPetal(anywhere) {
+    const r = Math.random(), d = r < .45 ? 0 : r < .85 ? 1 : 2;
+    const branch = !anywhere && Math.random() < .3;
+    return {
+      d, kind: Math.random() < [.06, .12, .22][d] ? "flower" : "petal",
+      x: branch ? W * (.68 + Math.random() * .3) : Math.random() * W * 1.25 - W * .25,
+      y: anywhere ? Math.random() * H : branch ? Math.random() * H * .14 : -30 * dpr,
+      s: ([3.2, 6, 9.5][d] + Math.random() * [1.5, 2.5, 4][d]) * dpr,
+      rot: Math.random() * 6.283, vr: (Math.random() - .5) * [.02, .035, .05][d],
+      flip: Math.random() * 6.283, vf: .012 + Math.random() * .03,
+      vx: (.12 + Math.random() * .3) * dpr * [.6, 1, 1.5][d], vy: (.25 + Math.random() * .35) * dpr * [.6, 1, 1.6][d],
+      ph: Math.random() * 6.283, sway: (.2 + Math.random() * .5) * dpr,
+      a: [.35, .62, .88][d] * (.8 + Math.random() * .2), col: PETAL[Math.random() * PETAL.length | 0], rest: 0
+    };
+  }
+  /* Vẽ sẵn mỗi kiểu cánh hoa / bông hoa ra canvas nhỏ một lần, mỗi khung hình chỉ dán lại (nhẹ máy hơn) */
+  const BASE = 48, SPR = {};
+  function petalPath(g, s) {
+    g.beginPath(); g.moveTo(0, -s * .72);
+    g.lineTo(s * .2, -s); g.bezierCurveTo(s * .95, -s * .55, s * .6, s * .65, 0, s);
+    g.bezierCurveTo(-s * .6, s * .65, -s * .95, -s * .55, -s * .2, -s); g.closePath(); g.fill();
+  }
+  function sprite(kind, col) {
+    const key = kind + col; if (SPR[key]) return SPR[key];
+    const size = kind === "flower" ? 128 : 104, cv = document.createElement("canvas"); cv.width = cv.height = size;
+    const g = cv.getContext("2d"); g.translate(size / 2, size / 2); g.fillStyle = col;
+    if (kind === "flower") {
+      const s = BASE * .62;
+      for (let i = 0; i < 5; i++) { g.save(); g.rotate(i * 1.2566); g.translate(0, -s * .95); petalPath(g, s); g.restore(); }
+      g.fillStyle = "#ff7aa8"; g.beginPath(); g.arc(0, 0, s * .32, 0, 6.283); g.fill();
+      g.fillStyle = "#ffe3a3"; for (let i = 0; i < 5; i++) { g.beginPath(); g.arc(Math.cos(i * 1.2566) * s * .3, Math.sin(i * 1.2566) * s * .3, s * .09, 0, 6.283); g.fill(); }
+    } else petalPath(g, BASE);
+    return (SPR[key] = cv);
+  }
+  function drawPetal(p) {
+    const img = sprite(p.kind, p.col), k = p.s / BASE;
+    const sx = p.kind === "flower" ? .8 + .2 * Math.cos(p.flip) : 1;
+    const sy = p.kind === "flower" ? 1 : p.rest ? .5 : .45 + .55 * Math.abs(Math.sin(p.flip));
+    const co = Math.cos(p.rot), si = Math.sin(p.rot);
+    x.setTransform(co * sx * k, si * sx * k, -si * sy * k, co * sy * k, p.x, p.y);
+    x.globalAlpha = p.a * (p.rest ? Math.min(1, p.rest / 60) : 1);
+    x.drawImage(img, -img.width / 2, -img.height / 2);
+  }
+  addEventListener("pointermove", e => { mx = e.clientX * dpr; my = e.clientY * dpr; }, { passive: true });
+  addEventListener("pointerleave", () => { mx = my = -1e9; });
   function resize() {
     W = c.width = innerWidth * dpr; H = c.height = innerHeight * dpr;
     const n = Math.round((innerWidth * innerHeight) / 5200);
@@ -1576,12 +1661,8 @@ setView(S.view || "quiz");
     }));
     if (LV === "n4") {
       stars = stars.slice(0, stars.length >> 1);
-      petals = Array.from({ length: Math.round((innerWidth * innerHeight) / 32000) + 6 }, () => ({
-        x: Math.random() * W, y: Math.random() * H, s: (Math.random() * 4 + 6) * dpr,
-        rot: Math.random() * 6.283, vr: (Math.random() - .5) * .03, flip: Math.random() * 6.283,
-        vx: (Math.random() * .35 + .15) * dpr, vy: (Math.random() * .45 + .35) * dpr, ph: Math.random() * 6.283,
-        a: Math.random() * .35 + .5, col: PETAL[Math.random() * PETAL.length | 0]
-      }));
+      const n = Math.min(150, Math.round((innerWidth * innerHeight) / 11000) + 14);
+      petals = Array.from({ length: n }, () => mkPetal(true));
     }
   }
   let shoot = null;
@@ -1593,16 +1674,30 @@ setView(S.view || "quiz");
       x.fillStyle = s.col;
       x.beginPath(); x.arc(s.x, s.y, s.r, 0, 6.283); x.fill();
     }
-    for (const p of petals) {
-      if (!still) { p.ph += .015; p.flip += .025; p.rot += p.vr; p.x += p.vx + Math.sin(p.ph) * .35 * dpr; p.y += p.vy;
-        if (p.y > H + 20 || p.x > W + 20) { p.y = -20; p.x = Math.random() * W * 1.1 - W * .1; } }
-      x.save(); x.globalAlpha = p.a; x.fillStyle = p.col;
-      x.translate(p.x, p.y); x.rotate(p.rot); x.scale(1, .45 + .55 * Math.abs(Math.sin(p.flip)));
-      const s = p.s;
-      x.beginPath(); x.moveTo(0, -s * .72);
-      x.lineTo(s * .2, -s); x.bezierCurveTo(s * .95, -s * .55, s * .6, s * .65, 0, s);
-      x.bezierCurveTo(-s * .6, s * .65, -s * .95, -s * .55, -s * .2, -s); x.closePath(); x.fill();
-      x.restore();
+    if (petals.length) {
+      if (!still) {
+        // gió: thỉnh thoảng một cơn gió thổi cả đám cánh hoa bay ngang rồi lặng dần
+        if (!gust && Math.random() < .0018) gust = { t: 0, dur: 200 + Math.random() * 160, str: (1.2 + Math.random() * 2.2) * dpr };
+        wind = gust ? gust.str * Math.sin(Math.PI * gust.t / gust.dur) : 0;
+        if (gust && ++gust.t > gust.dur) gust = null;
+      }
+      for (let i = 0; i < petals.length; i++) {
+        const p = petals[i];
+        if (!still) {
+          if (p.rest) { if (--p.rest <= 0) petals[i] = mkPetal(false); }
+          else {
+            p.ph += .016; p.flip += p.vf; p.rot += p.vr + wind * .004;
+            p.x += p.vx + Math.sin(p.ph) * p.sway + wind * [.5, .8, 1.1][p.d];
+            p.y += p.vy + Math.cos(p.ph * 1.3) * .12 * dpr;
+            const dx = p.x - mx, dy = p.y - my, dd = dx * dx + dy * dy, R = 110 * dpr;
+            if (dd < R * R) { const k = (1 - Math.sqrt(dd) / R) * 2.4 * dpr; const L = Math.sqrt(dd) || 1; p.x += dx / L * k; p.y += dy / L * k; p.vr += (Math.random() - .5) * .01; }
+            if (p.y > H - 6 * dpr && p.d === 2 && Math.random() < .35) { p.y = H - (2 + Math.random() * 8) * dpr; p.rest = 160 + Math.random() * 200; }
+            else if (p.y > H + 30 * dpr || p.x > W + 40 * dpr || p.x < -60 * dpr) petals[i] = mkPetal(false);
+          }
+        }
+        drawPetal(petals[i]);
+      }
+      x.setTransform(1, 0, 0, 1, 0, 0);
     }
     if (!still) {
       if (LV !== "n4" && !shoot && Math.random() < .0025) shoot = { x: Math.random() * W, y: Math.random() * H * .4, l: 0 };

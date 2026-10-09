@@ -6,7 +6,7 @@ Web app ôn từ vựng, kanji, ngữ pháp JLPT N5 và N4 theo kiểu Quizlet, 
 
 ## Tính năng
 
-- **Chọn cấp N5 / N4 / N5+N4** ở góc trên. Lựa chọn được nhớ lại; cũng có thể mở thẳng bằng link `?level=n4`. Chế độ N5+N4 trộn cả hai bộ để ôn tổng. Mỗi cấp có một bộ màu riêng: N5 vũ trụ đêm (vàng), N4 dạ anh đào (hồng, có cánh hoa rơi), N5+N4 cực quang (xanh).
+- **Chọn cấp N5 / N4 / N5+N4** ở góc trên. Lựa chọn được nhớ lại; cũng có thể mở thẳng bằng link `?level=n4`. Chế độ N5+N4 trộn cả hai bộ để ôn tổng. Mỗi cấp có một bộ màu riêng: N5 vũ trụ đêm (vàng), N4 dạ anh đào (hồng, cành anh đào ở góc, cánh hoa và bông hoa rơi theo gió, rê chuột làm cánh hoa dạt ra), N5+N4 cực quang (xanh).
 - **Trắc nghiệm 293 từ N5 và 798 từ N4**: 4 đáp án, chọn hướng Nhật → Việt, Việt → Nhật hoặc trộn cả hai. Lọc từ theo phần, chữ cái đầu, từ loại hoặc nhóm "từ hay sai".
 - **Hỏi lại câu sai**: từ trả lời sai sẽ được hỏi lại sau vài câu, đến khi đúng thì thôi.
 - **Đáp án có ví dụ**: mỗi từ N5 kèm một câu ví dụ, có hiragana đặt kế bên kanji, romaji và nghĩa tiếng Việt.
